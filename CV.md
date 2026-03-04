@@ -1,6 +1,8 @@
 # Julia Batista
 Fayetteville, Arkansas - USA 
-(479)283-2210 juliabatista1@hotmail.com github: https://github.com/juliagbatista
+(479)283-2210 
+juliabatista1@hotmail.com 
+github: https://github.com/juliagbatista
 
 
 ## Sumary
