@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 
+
 #import packages in the very top of the script
 import argparse 
 #------ function to parse the command line arguments
@@ -19,8 +20,12 @@ def get_args():
     parser.add_argument("-v", "--verbose",help="Print verbose otput", action='store_true')
 
 
-    #parse the arguments
+    #parse the arguments and return in two steps
     args = parser.parse_args()
+    return args
+    #or, parse the arguments and return in one step
+    #return parser.parse_args()
+
 
 #------- function to calculate Fibonacci number 
 def fib():
@@ -32,22 +37,29 @@ def fib():
 
     #loop
 
-    for i in range(int(args.position)):
+    for i in range(int(beyonce.position)):
         a,b = b, a+b
 
     fibonacci_number = a
+    return fibonacci_number
 
 #----- function to print the Fibonacci number at the given position, with an optional verbose output
-def print_output():
-    if args.verbose:
-        print(f"The fibonacci number for {args.position} is {fibonacci_number}")
+def print_output(output):
+    if beyonce.verbose:
+        print(f"The fibonacci number for {beyonce.position} is {output}")
     else: 
-        print(fibonacci_number)
+        print(fibnum)
+    
 
 #------ define the main() function to call the other functions in the correct order
 def main():
+    fibnum = fib()
+    print_output(fibnum)
+    #this print statement will not print variables that are local to fib()
+    #print(a , b, fibonacci_number)
 
-
+#------ calling get_args() happens out here on its own
+beyonce = get_args()
 
 # to creat function we add in the end of the script, we will do 3 (import, function definition, and then the main code block)
 # set the environment for this script 
