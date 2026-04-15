@@ -13,4 +13,10 @@ def get_args():
     # create an argument parser object
     parser = argparse.ArgumentParser(description="This script accepts two command line arguments: name of the genome FASTA file and name of the GFF file")
 
-   #
+   #add positional argument for the genome FASTA file
+    parser.add_argument("fasta", help="Name of the genome FASTA file")
+    # add positional argument for the GFF file
+    parser.add_argument("gff", help="Name of the GFF file")
+    # check the arguments and return them to main()
+    args = parser.parse_args()
+    return args
