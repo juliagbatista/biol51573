@@ -20,3 +20,14 @@ def get_args():
     # check the arguments and return them to main()
     args = parser.parse_args()
     return args
+
+# create the main() function to be able to run the script 
+
+def main(): 
+    print(f"FASTA file: {args.fasta}")
+    print(f"GFF file: {args.gff}")
+
+# get the arguments from the command line
+args = get_args()
+
+
