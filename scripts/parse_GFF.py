@@ -30,4 +30,9 @@ def main():
 # get the arguments from the command line
 args = get_args()
 
+# set the environment for this script
+if __name__ == '__main__':
+    main()
+
+
 
