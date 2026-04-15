@@ -8,3 +8,9 @@
 import argparse
 
 
+# parse the command line arguments
+def get_args():
+    # create an argument parser object
+    parser = argparse.ArgumentParser(description="This script accepts two command line arguments: name of the genome FASTA file and name of the GFF file")
+
+   #
