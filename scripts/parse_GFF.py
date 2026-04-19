@@ -36,11 +36,14 @@ gff_file = "/Users/quantgen/Documents/classes/project/data/files/data/covid_geno
 def read_fasta(fasta_file):
     print(f"Reading FASTA file: {fasta_file}")
 
-# open the FASTA file and read it line by line
+    # open the FASTA file and read it line by line
     f = open(fasta_file, "r")
 
     # skip the first header line
     next(f)
+
+    # initialize genome_sequence as an empty string before adding to it
+    genome_sequence = ""
 
     for line in f:
         # strip the newline character from each line
@@ -102,26 +105,25 @@ def read_gff(gff_file, genome_sequence):
     return gene_sequences
 
 
+# function to write the extracted sequences to a FASTA file
+## takes the gene_sequences dictionary and the output file name as arguments
+### writes each sequence in FASTA format: >sequence_id on one line, sequence on the next
 
+def write_output(gene_sequences, output_file):
+    print(f"Writing output to: {output_file}")
 
+    # open the output file for writing
+    f = open(output_file, "w")
 
+    # loop over each sequence ID and its sequence in the dictionary
+    for sequence_id, sequence in gene_sequences.items():
+        # write the FASTA header line with the sequence ID
+        f.write(f">{sequence_id}\n")
+        # write the sequence on the next line
+        f.write(f"{sequence}\n")
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+    f.close()
+    print(f"Done writing output file. {len(gene_sequences)} sequences written.")
 
 
 
@@ -136,6 +138,9 @@ def main():
 
     # pass genome_sequence into read_gff() so it can slice out each gene
     gene_sequences = read_gff(args.gff, genome_sequence)
+
+    # write the extracted sequences to covid_genes.fasta in FASTA format
+    write_output(gene_sequences, "covid_genes.fasta")
 
 # get the arguments from the command line
 args = get_args()
