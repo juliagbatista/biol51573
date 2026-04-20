@@ -37,15 +37,15 @@ def read_fasta(fasta_file):
     print(f"Reading FASTA file: {fasta_file}")
 
     # open the FASTA file and read it line by line
-    f = open(fasta_file, "r")
+    fasta = open(fasta_file, "r")
 
     # skip the first header line
-    next(f)
+    next(fasta)
 
     # initialize genome_sequence as an empty string before adding to it
     genome_sequence = ""
 
-    for line in f:
+    for line in fasta:
         # strip the newline character from each line
         line = line.strip()
         genome_sequence += line
@@ -59,12 +59,12 @@ def read_gff(gff_file, genome_sequence):
     print(f"Reading GFF3 file: {gff_file}")
 
     # open the GFF3 file and read it line by line
-    f = open(gff_file, "r")
+    gff = open(gff_file, "r")
 
     # create an empty dictionary to store sequence_id : sequence pairs
     gene_sequences = {}
 
-    for line in f:
+    for line in gff:
         # skip comment lines that start with '#'
         if line.startswith("#"):
             continue
@@ -100,7 +100,7 @@ def read_gff(gff_file, genome_sequence):
 
         print(f"Extracted sequence for {sequence_id}: {len(extracted_sequence)} bp")
 
-    f.close()
+    gff.close()
     print(f"Done reading GFF3 file. {len(gene_sequences)} features extracted.")
     return gene_sequences
 
@@ -113,16 +113,16 @@ def write_output(gene_sequences, output_file):
     print(f"Writing output to: {output_file}")
 
     # open the output file for writing
-    f = open(output_file, "w")
+    output = open(output_file, "w")
 
     # loop over each sequence ID and its sequence in the dictionary
     for sequence_id, sequence in gene_sequences.items():
         # write the FASTA header line with the sequence ID
-        f.write(f">{sequence_id}\n")
+        output.write(f">{sequence_id}\n")
         # write the sequence on the next line
-        f.write(f"{sequence}\n")
+        output.write(f"{sequence}\n")
 
-    f.close()
+    output.close()
     print(f"Done writing output file. {len(gene_sequences)} sequences written.")
 
 

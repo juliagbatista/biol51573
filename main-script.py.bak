@@ -1,0 +1,11 @@
+#!/usr/bin/eenv python3
+
+
+def main():
+    print('Hello, world!')
+
+
+# set the environment for this script
+# is it main(), or is this a module being called by something else?
+if __name__ == '__main__':
+    main()
