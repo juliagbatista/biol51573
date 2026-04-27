@@ -1,77 +1,102 @@
 #!/usr/bin/env python3
 
-#------ function to open and read the genome FASTA file
-def read_fasta(fasta_file):
-    print(f"Reading FASTA file: {fasta_file}")
+# function to open and read the genome FASTA file
 
+## put the file name as an argument to the function so it can be used in main() and called from the command line
+
+fasta_file = "/Users/quantgen/Documents/classes/project/data/files/data/covid_genome/covid.fasta"
+gff_file = "/Users/quantgen/Documents/classes/project/data/files/data/covid_genome/covid_genes.gff3"
+
+# function to read FASTA and return the genome sequence 
+def read_fasta(fasta_file):
+    
+    # open the FASTA file and read it line by line
+    fasta = open(fasta_file, "r")
+
+    # skip the first header line
+    next(fasta)
+
+    # jump the header line and read the rest
     genome_sequence = ""
 
-    # open the FASTA file and read each line
-    with open(fasta_file, "r") as f:
-        for line in f:
-            # skip the first header line (starts with '>')
-            if line.startswith(">"):
-                continue
-            # strip the newline character from each line and add to genome_sequence
-            genome_sequence += line.strip()
+    for line in fasta:
+        # using strip to remove the newline character from each line
+        line = line.strip()
+        genome_sequence += line
 
-    print(f"Done reading FASTA file. Genome length: {len(genome_sequence)} bp")
+    print(f"Genome length: {len(genome_sequence)} bp")
     return genome_sequence
 
-
-#------ function to read and parse the GFF3 file
+# function to read the GFF file 
 def read_gff(gff_file, genome_sequence):
-    print(f"Reading GFF file: {gff_file}")
+    
+    # open the GFF3 file and read it line by line
+    gff = open(gff_file, "r")
 
-    features = []
+    # create an empty dictionary to store sequence_id : sequence pairs
+    gene_sequences = {}
 
-    # open the GFF3 file and read each line
-    with open(gff_file, "r") as f:
-        for line in f:
-            # skip comment lines
-            if line.startswith("#"):
-                continue
-            # strip newline and split columns by tab
-            cols = line.strip().split("\t")
-            # make sure we have a full GFF line (9 columns)
-            if len(cols) < 9:
-                continue
+    for line in gff:
+        # skip comment lines that start with '#'
+        if line.startswith("#"):
+            continue
 
-            # extract begin and end coordinates (cols 4 and 5, 1-based in GFF)
-            begin = int(cols[3]) - 1   # convert to 0-based index
-            end = int(cols[4])         # end is inclusive in GFF, exclusive in Python slicing
+        # strip the newline character and split the line into columns by tab
+        columns = line.strip().split("\t")
 
-            # extract the sequence from the genome using the coordinates
-            extracted_sequence = genome_sequence[begin:end]
+        # GFF3 has 9 columns; skip any malformed lines
+        if len(columns) < 9:
+            continue
 
-            # extract the sequence ID from the last column (after "ID=")
-            attributes = cols[8]
-            seq_id = ""
-            for attribute in attributes.split(";"):
-                if attribute.startswith("ID="):
-                    seq_id = attribute.replace("ID=", "")
-                    break
+        # col 4 = start (1-based), col 5 = end (1-based)
+        start = int(columns[3])
+        end   = int(columns[4])
 
-            print(f"  Extracted feature: {seq_id} ({len(extracted_sequence)} bp)")
-            features.append((seq_id, extracted_sequence))
+        # col 9 = attributes; extract the value that follows "ID="
+        #list index 8 of columns and split by ";" to get individual attributes, then find the one that starts with "ID=" and extract the sequence ID, where 3: removes the "ID=" prefix from the attribute value
+        #the gff file reads starting with 1, but python uses 0-based indexing, so we need to subtract 1 from the start position when slicing the genome sequence
+        #so the start of python will be start = gff start - 1, and the end will be gff end (since the end position in GFF is inclusive, we can use it directly for slicing)
+        
+        attributes = columns[8]
+        sequence_id = None
+        for attribute in attributes.split(";"):
+            if attribute.startswith("ID="):
+                sequence_id = attribute[3:]  # remove the "ID=" prefix
+                break
 
-    print(f"Done reading GFF file. Total features extracted: {len(features)}")
-    return features
+        # if no ID was found, skip this feature
+        if sequence_id is None:
+            continue
+
+        # slice the genome sequence using 0-based indexing (GFF3 is 1-based)
+        extracted_sequence = genome_sequence[start - 1:end]
+
+        # store the result in the dictionary
+        gene_sequences[sequence_id] = extracted_sequence
+
+        print(f"Extracted sequence for {sequence_id}: {len(extracted_sequence)} bp")
+
+    gff.close()
+    print(f"{len(gene_sequences)} features extracted.")
+    return gene_sequences
 
 
-#------ function to write extracted sequences to a FASTA output file
-def write_output(features, output_file="covid_genes.fasta"):
+# function to write the extracted sequences to a FASTA file
+## takes the gene_sequences dictionary and the output file name as arguments
+### writes each sequence in FASTA format: >sequence_id on one line, sequence on the next
+
+def write_output(gene_sequences, output_file):
     print(f"Writing output to: {output_file}")
 
-    with open(output_file, "w") as out:
-        for seq_id, sequence in features:
-            # write in FASTA format: header line then sequence
-            out.write(f">{seq_id}\n")
-            out.write(f"{sequence}\n")
+    # open the output file for writing
+    output = open(output_file, "w")
 
-    print(f"Done writing output file: {output_file}")
+    # loop over each sequence ID and its sequence in the dictionary
+    for sequence_id, sequence in gene_sequences.items():
+        # write the FASTA header line with the sequence ID
+        output.write(f">{sequence_id}\n")
+        # write the sequence on the next line
+        output.write(f"{sequence}\n")
 
-
-# set the environment for this script
-# is it main(), or is this a module being called by something else?
-if __name__ == '__main__':
+    output.close()
+    print(f"Done writing output file. {len(gene_sequences)} sequences written.")
